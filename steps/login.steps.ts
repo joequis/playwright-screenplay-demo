@@ -6,8 +6,7 @@ import { LoginResult } from '../screenplay/questions/loginResult';
 
 import { setDefaultTimeout } from '@cucumber/cucumber';
 
-//muy lento la maquina para ejecutar, necesita extender a 10segundos
-setDefaultTimeout(10 * 1000); // 10 segundos
+//setDefaultTimeout(10 * 1000); // 10 segundos
 
 let actor: Actor;
 
