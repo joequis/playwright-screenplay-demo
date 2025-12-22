@@ -1,0 +1,7 @@
+{
+  "default": {
+    "require": ["./steps/**/*.ts", "./support/**/*.ts"],
+    "format": ["progress", "json:reports/cucumber-report.json"],
+    "publishQuiet": true
+  }
+}
