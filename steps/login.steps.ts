@@ -3,10 +3,8 @@ import { expect } from 'chai';
 import { Actor } from '../screenplay/actors/actor';
 import { Login } from '../screenplay/tasks/login';
 import { LoginResult } from '../screenplay/questions/loginResult';
-
 import { setDefaultTimeout } from '@cucumber/cucumber';
-
-//setDefaultTimeout(10 * 1000); // 10 segundos
+setDefaultTimeout(10 * 1000); // 10 segundos
 
 let actor: Actor;
 
@@ -16,7 +14,6 @@ Before(async function () {
 });
 
 Given('que el usuario abre la página de login', async function () {
-//actor = Actor.named('Joel').canBrowseTheWeb();
   await actor.attemptsTo(Login.openPage());
 });
 
@@ -24,8 +21,8 @@ When('ingresa credenciales válidas', async function () {
   await actor.attemptsTo(Login.enterCredentials('standard_user', 'secret_sauce'));
 });
 
-When('hace click en el botón login', async function () {
-  await actor.attemptsTo(Login.submit());
+Then('hace click en el botón login', async function () {
+  await actor.attemptsTo(Login.clickLogin());
 });
 
 Then('debería ver el título de la página de productos', async function () {
