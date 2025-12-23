@@ -1,15 +1,18 @@
 import { Actor } from '../actors/actor';
 import { loginLocators } from '../locators/loginLocators';
 
-export class LoginResult {
-  static title() {
-    return new LoginResult();
+export class ElementText {
+      static of(selector: string) {
+    return new ElementText(selector);
   }
+
+    private constructor(
+    private readonly selector: string,
+  ) {}
 
   async answeredBy(actor: Actor): Promise<string> {
     const page = actor.abilityToBrowse.pageInstance;
-    // En la página de inventario, el título es .title => "Swag Labs"
-    const locator = page.locator(loginLocators.loginTitle);
+    const locator = page.locator(this.selector);
     await locator.waitFor({ state: 'visible' });
     return await locator.textContent() as string;
   }

@@ -2,9 +2,12 @@
 import { Actor } from '../actors/actor';
 import { loginLocators } from '../locators/loginLocators';
  
-export class ClickLogin {
+export class ClickElement {
+
+  constructor(private elementName: string) {}
+
   async execute(actor: Actor): Promise<void> {
     const page = actor.abilityToBrowse.pageInstance;
-    await page.click(loginLocators.loginButton);
+    await page.click(`text=${this.elementName}`);
   }
 }
