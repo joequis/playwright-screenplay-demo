@@ -1,5 +1,4 @@
 import { Actor } from '../actors/actor';
-import { loginLocators } from '../locators/loginLocators';
 
 export class ElementText {
       static of(selector: string) {

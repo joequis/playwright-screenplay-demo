@@ -1,10 +1,10 @@
 // screenplay/interactions/clickLogin.ts
 import { Actor } from '../actors/actor';
-import { loginLocators } from '../locators/loginLocators';
+import { uiLogin } from '../ui/uiLogin';
  
 export class ClickLogin {
   async execute(actor: Actor): Promise<void> {
     const page = actor.abilityToBrowse.pageInstance;
-    await page.click(loginLocators.loginButton);
+    await page.click(uiLogin.loginButton);
   }
 }

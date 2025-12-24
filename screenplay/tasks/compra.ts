@@ -1,8 +1,5 @@
 // screenplay/tasks/compra.ts
 import { Actor } from '../actors/actor';
-import { EnterCredentials } from '../interactions/enterCredentials';
-import { ClickLogin } from '../interactions/clickLogin';
-import { AppUrls } from '../config/urls';
 import { ClickElement } from '../interactions/clickElement';
 
 export class Compra {
@@ -16,6 +13,7 @@ export class Compra {
         this.doClick = options?.click ?? false;
     }
 
+    // Método 1: seleccionar producto
     static selectProduct(productName: string) {
         return new Compra(productName, { click: true });
     }

@@ -1,6 +1,5 @@
-import { Given, When, Then, After, Before } from '@cucumber/cucumber';
+import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { Actor } from '../screenplay/actors/actor';
 import { CustomWorld } from '../support/world';
 import { Login } from '../screenplay/tasks/login';
 import { LoginResult } from '../screenplay/questions/loginResult';

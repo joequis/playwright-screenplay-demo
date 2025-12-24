@@ -1,4 +1,4 @@
-export const loginLocators = {
+export const uiLogin = {
     loginTitle: "//div[@class='app_logo']",
     usernameInput: '#user-name',
     passwordInput: '#password',

@@ -1,32 +1,24 @@
-// Opcional: para futuros escenarios, centraliza creación del Actor
-// Por simplicidad en este flujo, lo manejamos directamente en steps.
+// support/world.ts
+// Se utiliza CustomWorld para gestionar el ciclo de vida del Actor y los recursos de Playwright
 
 import { setWorldConstructor, World } from '@cucumber/cucumber';
-import { Browser, chromium, BrowserContext, Page } from 'playwright';
 import { Actor } from '../screenplay/actors/actor';
 
 export class CustomWorld extends World {
-    actor?: Actor;
-    browser?: Browser;
-    context?: BrowserContext;
-    page?: Page;
+  actor?: Actor;
 
-    
   async initActor(name: string) {
-    // Crea Playwright recursos por escenario
-    this.browser = await chromium.launch({ headless: true });
-    this.context = await this.browser.newContext();
-    this.page = await this.context.newPage();
+    // Crea el Actor y asigna la habilidad (la ability gestionará el browser internamente)
+    this.actor = Actor.named(name).canBrowseTheWeb();
 
-    // Crea el Actor y le da la habilidad
-    this.actor = Actor
-      .named(name)
-      .canBrowseTheWeb();
+    // Inicializa la page una vez para luego poder acceder con pageInstance
+    await this.actor.abilityToBrowse.openNewPage();
   }
 
   async cleanup() {
-    // Cierra recursos
+    // Cierra recursos con la abilidad BrowseTheWeb
     await this.actor?.abilityToBrowse.close();
+    this.actor = undefined;
   }
 }
 

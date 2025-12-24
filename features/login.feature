@@ -1,4 +1,6 @@
 Feature: Login
+
+@smoke @login
   Scenario: Usuario inicia sesión exitosamente
     Given que el usuario abre la página de login
     When ingresa credenciales válidas

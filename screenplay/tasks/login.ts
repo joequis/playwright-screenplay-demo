@@ -37,7 +37,8 @@ export class Login {
   async performAs(actor: Actor): Promise<void> {
     //Se le podría implementar un swich pero se vería más extenso
     if (this.doOpenPage) {
-      const page = await actor.abilityToBrowse.openNewPage();
+      //const page = await actor.abilityToBrowse.openNewPage();
+      const page = await actor.abilityToBrowse.pageInstance; // Usar pageInstance ya que la página fue abierta en el world
       await page.goto(AppUrls.LOGIN);
     }
  

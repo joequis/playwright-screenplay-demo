@@ -1,6 +1,5 @@
 // screenplay/interactions/clickLogin.ts
 import { Actor } from '../actors/actor';
-import { loginLocators } from '../locators/loginLocators';
  
 export class ClickElement {
 
