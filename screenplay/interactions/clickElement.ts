@@ -1,10 +1,12 @@
 // screenplay/interactions/clickLogin.ts
 import { Actor } from '../actors/actor';
-import { uiLogin } from '../ui/uiLogin';
  
-export class ClickLogin {
+export class ClickElement {
+
+  constructor(private elementName: string) {}
+
   async execute(actor: Actor): Promise<void> {
     const page = actor.abilityToBrowse.pageInstance;
-    await page.click(uiLogin.loginButton);
+    await page.click(`text=${this.elementName}`);
   }
 }
