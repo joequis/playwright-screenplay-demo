@@ -10,6 +10,7 @@ export class ElementText {
   ) {}
 
   async answeredBy(actor: Actor): Promise<string> {
+    console.log('Obteniendo el texto del elemento');
     const page = actor.abilityToBrowse.pageInstance;
     const locator = page.locator(this.selector);
     await locator.waitFor({ state: 'visible' });

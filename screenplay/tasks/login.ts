@@ -37,17 +37,20 @@ export class Login {
   async performAs(actor: Actor): Promise<void> {
     //Se le podría implementar un swich pero se vería más extenso
     if (this.doOpenPage) {
+      console.log('Ingresando a la página de login: %s', AppUrls.LOGIN);
       //const page = await actor.abilityToBrowse.openNewPage();
       const page = await actor.abilityToBrowse.pageInstance; // Usar pageInstance ya que la página fue abierta en el world
       await page.goto(AppUrls.LOGIN);
     }
  
     if (this.doEnterCredentials && this.user && this.password) {
+      console.log('Ingresando credenciales: %s / %s', this.user, this.password);
       const enter = new EnterCredentials(this.user, this.password);
       await enter.execute(actor);
     }
  
     if (this.doClick) {
+      console.log('Haciendo click en el botón de login');
       const click = new ClickLogin();
       await click.execute(actor);
     }

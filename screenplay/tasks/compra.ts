@@ -20,6 +20,7 @@ export class Compra {
 
     async performAs(actor: Actor): Promise<void> {
         if (this.doClick) {
+            console.log(`Seleccionando el producto: ${this.productName}`);
             const click = new ClickElement(this.productName!);
             await click.execute(actor);
         }

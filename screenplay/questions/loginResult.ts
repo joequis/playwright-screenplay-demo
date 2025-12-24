@@ -9,6 +9,7 @@ export class LoginResult {
   async answeredBy(actor: Actor): Promise<string> {
     const page = actor.abilityToBrowse.pageInstance;
     // En la página de inventario, el título es .title => "Swag Labs"
+    console.log('Obteniendo el título de la página de login');
     const locator = page.locator(uiLogin.loginTitle);
     await locator.waitFor({ state: 'visible' });
     return await locator.textContent() as string;
