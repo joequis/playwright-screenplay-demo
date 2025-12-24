@@ -17,6 +17,7 @@ yarn-error.log*
 cucumber-report.json
 cucumber-report.xml
 /reports/
+!reports/generate-report.js
  
 # Logs
 *.log
