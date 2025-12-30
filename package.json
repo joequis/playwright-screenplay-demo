@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node scripts/run-with-report.js",
-    "report": "node reports/generate-report.js"
+    "test": "node scripts/run-with-report.js"
   },
   "keywords": [],
   "author": "",
