@@ -1,73 +1,83 @@
+require('ts-node/register');
 
-// scripts/run-with-report.js
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const { loadMatrixConfig } = require(path.join(process.cwd(), 'support', 'config'));
 
 (async () => {
-  // Args tras `npm test --`, p.ej.: ["--tags", "@login"]
-  const userArgs = process.argv.slice(2);
-
-  // 1) Resolver la ruta del bin de cucumber leyendo su package.json
-  const cucumberPkgJsonPath = require.resolve('@cucumber/cucumber/package.json');
-  const cucumberPkgDir = path.dirname(cucumberPkgJsonPath);
-  const cucumberPkg = JSON.parse(fs.readFileSync(cucumberPkgJsonPath, 'utf8'));
-  // El campo `bin` puede ser string o objeto { "cucumber-js": "..." }
-  const binField = cucumberPkg.bin;
-  const cucumberBinRel =
-    typeof binField === 'string'
-      ? binField
-      : (binField && binField['cucumber-js']) || binField;
-  if (!cucumberBinRel) {
-    console.error('❌ No se pudo localizar el binario de cucumber-js en el package.json.');
+  const { browsers, headless: defaultHeadless, parallel } = loadMatrixConfig();
+  if (!browsers.length) {
+    console.error('❌ Config: "browsers" vacío.');
     process.exit(1);
   }
-  const cucumberBinAbs = path.resolve(cucumberPkgDir, cucumberBinRel);
+  const userArgs = process.argv.slice(2);
 
-  // 2) Armar los argumentos del CLI (ajusta rutas si tu estructura es distinta)
-  const cucumberArgs = [
-    cucumberBinAbs,
-    './features', // carpeta con tus .feature (AJUSTA si usas otra)
-    '--require-module', 'ts-node/register',
-    '--require', './features/**/*.ts', // globo para steps TS (AJUSTA si usas otra)
-    '--format', 'json:reports/cucumber-report.json',
-    '--format', 'progress',
-    ...userArgs
-  ];
+  // Resolver bin cucumber-js …
+  let cucumberBinAbs;
+  try {
+    const pkgPath = require.resolve('@cucumber/cucumber/package.json');
+    const pkgDir = path.dirname(pkgPath);
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    const rel = typeof pkg.bin === 'string' ? pkg.bin : (pkg.bin && pkg.bin['cucumber-js']) || pkg.bin;
+    cucumberBinAbs = path.resolve(pkgDir, rel);
+  } catch {
+    console.error('❌ Instala @cucumber/cucumber.');
+    process.exit(1);
+  }
 
-  console.log('> Ejecutando Cucumber con:', cucumberArgs.slice(1).join(' '));
+  const runNode = (args, options = {}) =>
+    new Promise((resolve) => {
+      const child = spawn(process.execPath, args, {
+        stdio: 'inherit',
+        cwd: process.cwd(),
+        shell: false,
+        ...options
+      });
+      child.on('close', (code) => resolve(code ?? 0));
+    });
 
-  // 3) Ejecutar "node <bin> ..." SIN shell
-  const cucumber = spawn(process.execPath, cucumberArgs, {
-    stdio: 'inherit',
-    shell: false,
-    cwd: process.cwd()
-  });
+  const runForBrowser = async (entry) => {
+    const browserName = entry.name;
+    const headless = typeof entry.headless === 'boolean' ? entry.headless : defaultHeadless;
 
-  cucumber.on('close', async (code) => {
-    const exitCode = code ?? 0;
-    console.log(`> Cucumber terminó con código: ${exitCode}`);
-    try {
-      await runReport();
-    } catch (err) {
-      console.error('❌ Error generando el reporte:', err);
-    }
-    process.exit(exitCode); // devolver el mismo exit code de cucumber
-  });
+    const jsonOut = path.join('reports', 'json', browserName, 'cucumber-report.json');
+    fs.mkdirSync(path.dirname(jsonOut), { recursive: true });
+
+    const worldParams = JSON.stringify({ browser: browserName, headless });
+
+    const args = [
+      cucumberBinAbs,
+      './features',
+      '--require-module', 'ts-node/register',
+      '--require', 'src/support/**/*.ts',
+      '--require', 'steps/**/*.ts',
+      '--format', `json:${jsonOut}`,
+      '--format', 'progress',
+      '--parallel', String(parallel),
+      '--world-parameters', worldParams,
+      ...userArgs
+    ];
+
+    console.log(`> Ejecutando (${browserName}, headless=${headless}) → ${args.slice(1).join(' ')}`);
+    const code = await runNode(args, {
+      env: { ...process.env, BROWSER: browserName, HEADLESS: String(headless) }
+    });
+    return { browserName, code, jsonOut };
+  };
+
+  const results = [];
+  for (const entry of browsers) {
+    results.push(await runForBrowser(entry));
+  }
+
+  const reportScript = path.join(process.cwd(), 'reports', 'generate-report.js');
+  if (fs.existsSync(reportScript)) {
+    console.log('> Generando reporte HTML…');
+    const rc = await runNode([reportScript]);
+    if (rc !== 0) console.error(`❌ Reporte salió con código ${rc}`);
+  }
+
+  const finalExit = results.some(r => r.code !== 0) ? 1 : 0;
+  process.exit(finalExit);
 })();
-
-function runReport() {
-  return new Promise((resolve, reject) => {
-    console.log('> Generando reporte HTML...');
-    const reportScript = path.join(process.cwd(), 'reports', 'generate-report.js');
-    const nodeProc = spawn(process.execPath, [reportScript], {
-      stdio: 'inherit',
-      shell: false,
-      cwd: process.cwd()
-    });
-    nodeProc.on('close', (code) => {
-      if (code === 0) resolve();
-      else reject(new Error(`Reporte salió con código ${code}`));
-    });
-  });
-}

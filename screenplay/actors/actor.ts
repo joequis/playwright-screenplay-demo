@@ -12,8 +12,8 @@ export class Actor {
     return new Actor(name);
   }
 
-  canBrowseTheWeb(): Actor {
-    this.web = new BrowseTheWeb();
+  withAbility(ability: BrowseTheWeb): Actor {
+    this.web = ability;
     return this;
   }
 
